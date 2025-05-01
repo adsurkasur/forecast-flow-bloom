@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SimplexInput, SimplexResult, solveSimplex, validateSimplexInput } from '@/utils/simplexUtils';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { InfoIcon } from 'lucide-react';
 
 const LinearOptimizationTool: React.FC = () => {
   const [numVars, setNumVars] = useState<number>(2);
@@ -148,6 +151,10 @@ const LinearOptimizationTool: React.FC = () => {
           <CardTitle className="text-dark-pale-green">Linear Optimization Tool</CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 bg-bright-pale-green/10 p-4 rounded-lg text-sm border border-bright-pale-green">
+            <p>Linear optimization helps find the best solution (like maximum profit or minimum cost) by adjusting variables while respecting limits. This tool makes it easy to set up and solve these problems!</p>
+          </div>
+          
           <Tabs defaultValue="setup" className="w-full">
             <TabsList className="mb-4">
               <TabsTrigger value="setup">Problem Setup</TabsTrigger>
@@ -158,7 +165,17 @@ const LinearOptimizationTool: React.FC = () => {
             <TabsContent value="setup" className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="num-vars">Number of Decision Variables</Label>
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="num-vars">Number of Decision Variables</Label>
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80 p-3 text-sm">
+                        Decision variables are the quantities you want to determine (e.g., how many products to make, how much to invest). Each variable represents a different choice you can make.
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
                   <Input
                     id="num-vars"
                     type="number"
@@ -170,7 +187,17 @@ const LinearOptimizationTool: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="num-constraints">Number of Constraints</Label>
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="num-constraints">Number of Constraints</Label>
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80 p-3 text-sm">
+                        Constraints are the limitations or requirements your solution must respect (e.g., limited resources, minimum requirements). Each constraint is a separate condition your solution must satisfy.
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
                   <Input
                     id="num-constraints"
                     type="number"
@@ -184,7 +211,17 @@ const LinearOptimizationTool: React.FC = () => {
               </div>
               
               <div className="mt-4">
-                <Label>Variable Names</Label>
+                <div className="flex items-center space-x-2">
+                  <Label>Variable Names</Label>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 p-3 text-sm">
+                      Give each variable a meaningful name to make it easier to understand your problem (e.g., 'chairs', 'tables', 'investment1'). By default, they're named x1, x2, etc.
+                    </HoverCardContent>
+                  </HoverCard>
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-2">
                   {variableNames.map((name, index) => (
                     <div key={`var-${index}`}>
@@ -202,7 +239,17 @@ const LinearOptimizationTool: React.FC = () => {
             
             <TabsContent value="objective" className="space-y-4">
               <div>
-                <Label>Optimization Goal</Label>
+                <div className="flex items-center space-x-2">
+                  <Label>Optimization Goal</Label>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 p-3 text-sm">
+                      Choose whether you want to maximize something good (like profit) or minimize something you want to reduce (like cost or time).
+                    </HoverCardContent>
+                  </HoverCard>
+                </div>
                 <Select 
                   onValueChange={(value) => setObjectiveType(value as 'max' | 'min')} 
                   defaultValue={objectiveType}
@@ -218,7 +265,17 @@ const LinearOptimizationTool: React.FC = () => {
               </div>
               
               <div className="mt-4">
-                <Label>Objective Function Coefficients</Label>
+                <div className="flex items-center space-x-2">
+                  <Label>Objective Function Coefficients</Label>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 p-3 text-sm">
+                      These values represent how much each variable contributes to your goal. For example, if each chair gives $10 profit, the coefficient would be 10 for the chair variable.
+                    </HoverCardContent>
+                  </HoverCard>
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-2">
                   {objectiveCoefficients.map((coeff, index) => (
                     <div key={`obj-coeff-${index}`} className="flex items-center gap-2">
@@ -237,13 +294,27 @@ const LinearOptimizationTool: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="constraints" className="space-y-4">
+              <div className="bg-bright-pale-green/10 p-4 rounded-lg text-sm border border-bright-pale-green mb-4">
+                <p>Constraints represent the limitations in your problem. For example, if you can't use more than 100 hours of labor, you would create a constraint where the total labor used is ≤ 100.</p>
+              </div>
+              
               {constraints.map((constraint, constraintIndex) => (
                 <div key={`constraint-${constraintIndex}`} className="p-4 bg-pale-green/10 rounded-lg">
                   <h3 className="font-medium mb-3">Constraint {constraintIndex + 1}</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="col-span-2">
-                      <Label>Coefficients</Label>
+                      <div className="flex items-center space-x-2">
+                        <Label>Coefficients</Label>
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-80 p-3 text-sm">
+                            These values show how much of the resource each variable uses. For example, if each chair needs 2 hours of labor, enter 2 for the chair variable.
+                          </HoverCardContent>
+                        </HoverCard>
+                      </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
                         {constraint.coefficients.map((coeff, varIndex) => (
                           <div key={`constraint-${constraintIndex}-var-${varIndex}`} className="flex items-center gap-2">
@@ -267,7 +338,21 @@ const LinearOptimizationTool: React.FC = () => {
                     <div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label>Operator</Label>
+                          <div className="flex items-center space-x-2">
+                            <Label>Operator</Label>
+                            <HoverCard>
+                              <HoverCardTrigger asChild>
+                                <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                              </HoverCardTrigger>
+                              <HoverCardContent className="w-80 p-3 text-sm">
+                                ≤ means "less than or equal to" (for maximum limits)
+                                <br />
+                                ≥ means "greater than or equal to" (for minimum requirements)
+                                <br />
+                                = means "equal to exactly" (for fixed requirements)
+                              </HoverCardContent>
+                            </HoverCard>
+                          </div>
                           <Select 
                             onValueChange={(value) => handleConstraintOperatorChange(
                               constraintIndex, 
@@ -287,7 +372,17 @@ const LinearOptimizationTool: React.FC = () => {
                         </div>
                         
                         <div>
-                          <Label>Value</Label>
+                          <div className="flex items-center space-x-2">
+                            <Label>Value</Label>
+                            <HoverCard>
+                              <HoverCardTrigger asChild>
+                                <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                              </HoverCardTrigger>
+                              <HoverCardContent className="w-80 p-3 text-sm">
+                                The limit for this constraint. For example, if you have at most 100 hours available, enter 100.
+                              </HoverCardContent>
+                            </HoverCard>
+                          </div>
                           <Input
                             value={constraint.rhs}
                             onChange={(e) => handleConstraintRhsChange(constraintIndex, e.target.value)}
@@ -323,7 +418,17 @@ const LinearOptimizationTool: React.FC = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-bright-pale-green/20 p-6 rounded-lg border border-bright-pale-green">
-                <h3 className="text-lg font-medium mb-2">Optimal Value</h3>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-lg font-medium mb-2">Optimal Value</h3>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 p-3 text-sm">
+                      This is the best possible value for your objective function - the maximum profit or minimum cost you can achieve while satisfying all constraints.
+                    </HoverCardContent>
+                  </HoverCard>
+                </div>
                 <p className="text-3xl font-bold text-dark-pale-green">
                   {result.optimalValue.toFixed(2)}
                 </p>
@@ -333,7 +438,17 @@ const LinearOptimizationTool: React.FC = () => {
               </div>
               
               <div className="bg-white p-6 rounded-lg border border-pale-green">
-                <h3 className="text-lg font-medium mb-2">Variable Values</h3>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-lg font-medium mb-2">Variable Values</h3>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 p-3 text-sm">
+                      These are the optimal amounts for each decision variable - the values that give you the best possible result while satisfying all constraints.
+                    </HoverCardContent>
+                  </HoverCard>
+                </div>
                 <div className="space-y-2">
                   {Object.entries(result.variableValues).map(([varName, value]) => (
                     <div key={varName} className="flex justify-between items-center">

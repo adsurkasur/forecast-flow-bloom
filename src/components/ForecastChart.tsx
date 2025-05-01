@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface ForecastChartProps {
   historicalValues: number[];
@@ -12,7 +12,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
   const chartData = [
     ...historicalValues.map((value, index) => ({
       period: `P${index + 1}`,
-      value,
+      value: isNaN(value) ? null : value,
     })),
     {
       period: `P${historicalValues.length + 1}`,
@@ -20,6 +20,17 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
       forecast, // Forecast value
     },
   ];
+
+  // Check if we have valid data to display
+  const hasValidData = historicalValues.some(val => !isNaN(val) && val !== null);
+
+  if (!hasValidData && forecast === 0) {
+    return (
+      <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
+        <p className="text-muted-foreground">Enter values to see forecast chart</p>
+      </div>
+    );
+  }
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -31,13 +42,14 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
         <XAxis dataKey="period" tick={{ fontSize: 12 }} />
         <YAxis tick={{ fontSize: 12 }} />
         <Tooltip 
-          formatter={(value: number) => [value.toFixed(2), 'Value']}
+          formatter={(value: number) => [value?.toFixed(2) || '-', 'Value']}
           contentStyle={{ 
             backgroundColor: 'white',
             border: '1px solid #e0e0e0',
             borderRadius: '4px',
           }}
         />
+        <Legend />
         <Line 
           type="monotone" 
           dataKey="value" 
@@ -46,6 +58,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
           dot={{ r: 4, fill: '#4A8B63' }}
           activeDot={{ r: 6 }}
           name="Historical"
+          connectNulls
         />
         <Line 
           type="monotone" 
