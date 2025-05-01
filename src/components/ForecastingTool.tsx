@@ -25,18 +25,6 @@ const ForecastingTool: React.FC = () => {
   const [forecast, setForecast] = useState<number | null>(null);
   const [mae, setMae] = useState<number | null>(null);
   const [mape, setMape] = useState<number | null>(null);
-  const [liveChart, setLiveChart] = useState<boolean>(true);
-
-  // Effect for live updates
-  useEffect(() => {
-    if (liveChart) {
-      try {
-        updateForecast(false);
-      } catch (error) {
-        // Silent fail for live updates
-      }
-    }
-  }, [values, windowSize]);
 
   const handlePeriodsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPeriods = parseInt(e.target.value, 10) || 0;
@@ -52,7 +40,6 @@ const ForecastingTool: React.FC = () => {
   const handleWindowSizeChange = (value: string) => {
     const newWindowSize = parseInt(value, 10);
     setWindowSize(newWindowSize);
-    updateForecast(false);
   };
 
   const handleValueChange = (index: number, value: string) => {
@@ -134,7 +121,7 @@ const ForecastingTool: React.FC = () => {
                     <HoverCardTrigger asChild>
                       <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                     </HoverCardTrigger>
-                    <HoverCardContent className="w-80 p-3 text-sm">
+                    <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                       Enter the number of past data points you have available (e.g., 6 months of sales data, 12 weeks of website traffic)
                     </HoverCardContent>
                   </HoverCard>
@@ -157,7 +144,7 @@ const ForecastingTool: React.FC = () => {
                     <HoverCardTrigger asChild>
                       <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                     </HoverCardTrigger>
-                    <HoverCardContent className="w-80 p-3 text-sm">
+                    <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                       The number of periods to include in the moving average calculation. A larger window size creates a smoother forecast but is less responsive to recent changes. SMA(3) means averaging the last 3 periods.
                     </HoverCardContent>
                   </HoverCard>
@@ -193,7 +180,7 @@ const ForecastingTool: React.FC = () => {
                   <HoverCardTrigger asChild>
                     <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                   </HoverCardTrigger>
-                  <HoverCardContent className="w-80 p-3 text-sm">
+                  <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                     Enter the values for each historical period. For example, monthly sales figures, website visitors, or any other numeric data you want to forecast.
                   </HoverCardContent>
                 </HoverCard>
@@ -244,7 +231,7 @@ const ForecastingTool: React.FC = () => {
                       <HoverCardTrigger asChild>
                         <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                       </HoverCardTrigger>
-                      <HoverCardContent className="w-80 p-3 text-sm">
+                      <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                         These metrics show how accurately the SMA model would have predicted past values. Lower numbers indicate better forecast accuracy.
                       </HoverCardContent>
                     </HoverCard>
@@ -257,7 +244,7 @@ const ForecastingTool: React.FC = () => {
                         <HoverCardTrigger asChild>
                           <InfoIcon className="h-3 w-3 text-muted-foreground cursor-help inline ml-1" />
                         </HoverCardTrigger>
-                        <HoverCardContent className="w-80 p-3 text-sm">
+                        <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                           Mean Absolute Error: The average absolute difference between forecasted values and actual values.
                         </HoverCardContent>
                       </HoverCard>
@@ -269,7 +256,7 @@ const ForecastingTool: React.FC = () => {
                         <HoverCardTrigger asChild>
                           <InfoIcon className="h-3 w-3 text-muted-foreground cursor-help inline ml-1" />
                         </HoverCardTrigger>
-                        <HoverCardContent className="w-80 p-3 text-sm">
+                        <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                           Mean Absolute Percentage Error: The average percentage difference between forecasted values and actual values.
                         </HoverCardContent>
                       </HoverCard>

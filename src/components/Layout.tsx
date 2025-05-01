@@ -28,7 +28,7 @@ const Layout: React.FC = () => {
                   <HoverCardTrigger asChild>
                     <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                   </HoverCardTrigger>
-                  <HoverCardContent className="w-80 p-3 text-sm">
+                  <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                     Simple Moving Average (SMA) is a forecasting method that predicts future values by averaging the most recent data points. It's great for quick, easy-to-understand predictions.
                   </HoverCardContent>
                 </HoverCard>
@@ -41,7 +41,7 @@ const Layout: React.FC = () => {
                   <HoverCardTrigger asChild>
                     <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                   </HoverCardTrigger>
-                  <HoverCardContent className="w-80 p-3 text-sm">
+                  <HoverCardContent className="w-auto max-w-sm p-3 text-sm">
                     Linear optimization helps find the best solution to problems with limited resources. It's useful for maximizing profit, minimizing cost, or making the most efficient use of what you have.
                   </HoverCardContent>
                 </HoverCard>
