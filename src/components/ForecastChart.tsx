@@ -11,11 +11,11 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
   // Prepare data for the chart
   const chartData = [
     ...historicalValues.map((value, index) => ({
-      period: `S${index + 1}`,
+      period: `P${index + 1}`,
       value: isNaN(value) ? null : value,
     })),
     {
-      period: `S${historicalValues.length + 1}`,
+      period: `P${historicalValues.length + 1}`,
       value: null, // Empty value for historical
       forecast, // Forecast value
     },
@@ -27,7 +27,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
   if (!hasValidData && forecast === 0) {
     return (
       <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
-        <p className="text-muted-foreground">Enter yield values to see forecast chart</p>
+        <p className="text-muted-foreground">Enter values to see forecast chart</p>
       </div>
     );
   }
@@ -39,20 +39,15 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-        <XAxis 
-          dataKey="period" 
-          tick={{ fontSize: 12 }}
-          tickFormatter={(value) => value.replace('S', 'Season ')} 
-        />
+        <XAxis dataKey="period" tick={{ fontSize: 12 }} />
         <YAxis tick={{ fontSize: 12 }} />
         <Tooltip 
-          formatter={(value: number) => [value?.toFixed(2) || '-', 'Yield']}
+          formatter={(value: number) => [value?.toFixed(2) || '-', 'Value']}
           contentStyle={{ 
             backgroundColor: 'white',
             border: '1px solid #e0e0e0',
             borderRadius: '4px',
           }}
-          labelFormatter={(value) => `Growing ${value.replace('S', 'Season ')}`}
         />
         <Legend />
         <Line 
@@ -62,7 +57,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
           strokeWidth={2}
           dot={{ r: 4, fill: '#4A8B63' }}
           activeDot={{ r: 6 }}
-          name="Historical Yield"
+          name="Historical"
           connectNulls
         />
         <Line 
@@ -72,7 +67,7 @@ const ForecastChart: React.FC<ForecastChartProps> = ({ historicalValues, forecas
           strokeWidth={2}
           strokeDasharray="5 5"
           dot={{ r: 5, fill: '#A7F0C1', stroke: '#4A8B63' }}
-          name="Forecasted Yield"
+          name="Forecast"
         />
       </LineChart>
     </ResponsiveContainer>

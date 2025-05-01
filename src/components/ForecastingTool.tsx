@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
   generateHistoricalForecasts
 } from '@/utils/forecastingUtils';
 import ForecastChart from '@/components/ForecastChart';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { InfoIcon } from 'lucide-react';
 
@@ -24,10 +25,18 @@ const ForecastingTool: React.FC = () => {
   const [forecast, setForecast] = useState<number | null>(null);
   const [mae, setMae] = useState<number | null>(null);
   const [mape, setMape] = useState<number | null>(null);
-  const [chartData, setChartData] = useState<{historicalValues: number[], forecast: number}>({
-    historicalValues: Array(6).fill(0),
-    forecast: 0
-  });
+  const [liveChart, setLiveChart] = useState<boolean>(true);
+
+  // Effect for live updates
+  useEffect(() => {
+    if (liveChart) {
+      try {
+        updateForecast(false);
+      } catch (error) {
+        // Silent fail for live updates
+      }
+    }
+  }, [values, windowSize]);
 
   const handlePeriodsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPeriods = parseInt(e.target.value, 10) || 0;
@@ -43,6 +52,7 @@ const ForecastingTool: React.FC = () => {
   const handleWindowSizeChange = (value: string) => {
     const newWindowSize = parseInt(value, 10);
     setWindowSize(newWindowSize);
+    updateForecast(false);
   };
 
   const handleValueChange = (index: number, value: string) => {
@@ -55,14 +65,14 @@ const ForecastingTool: React.FC = () => {
     // Validate inputs
     if (!validateNumericInputs(values)) {
       if (showToast) {
-        toast.error("Please enter valid numeric values for all growing seasons");
+        toast.error("Please enter valid numeric values for all periods");
       }
       return;
     }
 
     if (periods < windowSize) {
       if (showToast) {
-        toast.error(`You need at least ${windowSize} growing seasons for SMA(${windowSize})`);
+        toast.error(`You need at least ${windowSize} periods for SMA(${windowSize})`);
       }
       return;
     }
@@ -74,12 +84,6 @@ const ForecastingTool: React.FC = () => {
       // Calculate forecast
       const forecastValue = calculateSMA(numericValues, windowSize);
       setForecast(parseFloat(forecastValue.toFixed(2)));
-      
-      // Update chart data
-      setChartData({
-        historicalValues: numericValues,
-        forecast: parseFloat(forecastValue.toFixed(2))
-      });
       
       // Calculate error metrics for historical data
       if (numericValues.length > windowSize) {
@@ -98,7 +102,7 @@ const ForecastingTool: React.FC = () => {
       }
       
       if (showToast) {
-        toast.success("Crop yield forecast calculated successfully");
+        toast.success("Forecast calculated successfully");
       }
     } catch (error) {
       if (showToast) {
@@ -125,13 +129,13 @@ const ForecastingTool: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center space-x-2">
-                  <Label htmlFor="periods">Number of Historical Growing Seasons</Label>
+                  <Label htmlFor="periods">Number of Historical Periods</Label>
                   <HoverCard>
                     <HoverCardTrigger asChild>
                       <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                     </HoverCardTrigger>
                     <HoverCardContent className="w-80 p-3 text-sm">
-                      Enter the number of past growing seasons you have yield data for (e.g., 6 seasons of corn yields, 12 quarters of vegetable production)
+                      Enter the number of past data points you have available (e.g., 6 months of sales data, 12 weeks of website traffic)
                     </HoverCardContent>
                   </HoverCard>
                 </div>
@@ -154,7 +158,7 @@ const ForecastingTool: React.FC = () => {
                       <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                     </HoverCardTrigger>
                     <HoverCardContent className="w-80 p-3 text-sm">
-                      The number of growing seasons to include in your yield average calculation. A larger window creates a smoother forecast but is less responsive to recent climate or soil condition changes. SMA(3) means averaging yields from the last 3 growing seasons.
+                      The number of periods to include in the moving average calculation. A larger window size creates a smoother forecast but is less responsive to recent changes. SMA(3) means averaging the last 3 periods.
                     </HoverCardContent>
                   </HoverCard>
                 </div>
@@ -184,13 +188,13 @@ const ForecastingTool: React.FC = () => {
             
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Label>Historical Yield Values</Label>
+                <Label>Historical Values</Label>
                 <HoverCard>
                   <HoverCardTrigger asChild>
                     <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                   </HoverCardTrigger>
                   <HoverCardContent className="w-80 p-3 text-sm">
-                    Enter the crop yield values for each historical growing season. For example, bushels per acre, tons of harvest, or any other agricultural production metric you want to forecast.
+                    Enter the values for each historical period. For example, monthly sales figures, website visitors, or any other numeric data you want to forecast.
                   </HoverCardContent>
                 </HoverCard>
               </div>
@@ -198,7 +202,7 @@ const ForecastingTool: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   {Array.from({ length: periods }).map((_, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <Label htmlFor={`period-${index+1}`} className="w-20">Season {index+1}:</Label>
+                      <Label htmlFor={`period-${index+1}`} className="w-20">Period {index+1}:</Label>
                       <Input
                         id={`period-${index+1}`}
                         type="number"
@@ -223,12 +227,12 @@ const ForecastingTool: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-bright-pale-green/20 p-6 rounded-lg border border-bright-pale-green">
-              <h3 className="text-lg font-medium mb-2">Next Season Yield Forecast</h3>
+              <h3 className="text-lg font-medium mb-2">Next Period Forecast</h3>
               <p className="text-3xl font-bold text-dark-pale-green">
                 {forecast !== null ? forecast : '-'}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Based on SMA({windowSize}) of the last {windowSize} growing seasons
+                Based on SMA({windowSize}) of the last {windowSize} periods
               </p>
               
               {/* Error metrics section */}
@@ -241,7 +245,7 @@ const ForecastingTool: React.FC = () => {
                         <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
                       </HoverCardTrigger>
                       <HoverCardContent className="w-80 p-3 text-sm">
-                        These metrics show how accurately the SMA model would have predicted past yields. Lower numbers indicate better forecast accuracy for your specific crop and growing conditions.
+                        These metrics show how accurately the SMA model would have predicted past values. Lower numbers indicate better forecast accuracy.
                       </HoverCardContent>
                     </HoverCard>
                   </div>
@@ -254,7 +258,7 @@ const ForecastingTool: React.FC = () => {
                           <InfoIcon className="h-3 w-3 text-muted-foreground cursor-help inline ml-1" />
                         </HoverCardTrigger>
                         <HoverCardContent className="w-80 p-3 text-sm">
-                          Mean Absolute Error: The average absolute difference between forecasted crop yields and actual yields. This shows the average amount your forecast might be off in the same units as your yield measurements.
+                          Mean Absolute Error: The average absolute difference between forecasted values and actual values.
                         </HoverCardContent>
                       </HoverCard>
                     </div>
@@ -266,7 +270,7 @@ const ForecastingTool: React.FC = () => {
                           <InfoIcon className="h-3 w-3 text-muted-foreground cursor-help inline ml-1" />
                         </HoverCardTrigger>
                         <HoverCardContent className="w-80 p-3 text-sm">
-                          Mean Absolute Percentage Error: The average percentage difference between forecasted crop yields and actual yields. This shows how accurate your forecast is as a percentage regardless of crop type or yield magnitude.
+                          Mean Absolute Percentage Error: The average percentage difference between forecasted values and actual values.
                         </HoverCardContent>
                       </HoverCard>
                     </div>
@@ -277,8 +281,8 @@ const ForecastingTool: React.FC = () => {
             
             <div className="h-[200px]">
               <ForecastChart 
-                historicalValues={chartData.historicalValues} 
-                forecast={chartData.forecast} 
+                historicalValues={values.map(v => parseFloat(v) || 0)} 
+                forecast={forecast || 0} 
               />
             </div>
           </div>
